@@ -8,16 +8,29 @@ exports.getPresell = (req, res) => {
 // criar presell
 exports.createPresell = async (req, res) => {
   try {
-    const { title, slug, content } = req.body;
+    const { title, slug, content, redirectUrl } = req.body;
 
     const presell = await prisma.presell.create({
-      data: { title, slug, content }
+      data: {
+        title,
+        slug,
+        content,
+        redirectUrl,
+      }
     });
 
     res.json(presell);
 
   } catch (error) {
     console.error(error);
+
+    // 🔥 TRATAMENTO DE ERRO DE SLUG DUPLICADO
+    if (error.code === "P2002") {
+      return res.status(400).json({
+        error: "Slug já existe. Escolha outro."
+      });
+    }
+
     res.status(500).json({ error: 'Erro ao criar presell' });
   }
 };
@@ -52,7 +65,6 @@ exports.getPresellBySlug = async (req, res) => {
 
       console.log("UTMs:", utm_source, utm_campaign);
 
-      // 🔥 ENVIA PARA BACKEND
       fetch("http://localhost:3000/tracking", {
         method: "POST",
         headers: {
@@ -66,7 +78,7 @@ exports.getPresellBySlug = async (req, res) => {
       });
 
       setTimeout(() => {
-        window.location.href = "https://google.com";
+        window.location.href = "${page.redirectUrl || 'https://google.com'}";
       }, 8000);
     </script>
     `;

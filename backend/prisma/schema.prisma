@@ -12,6 +12,7 @@ model Presell {
   title     String
   slug      String   @unique
   content   String
+  redirectUrl String?
   createdAt DateTime @default(now())
 }
 
