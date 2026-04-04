@@ -1,14 +1,10 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
 
-const {
-  getPresell,
-  createPresell,
-  getPresellBySlug
-} = require('../controllers/presellController');
+const presellController = require("../controllers/presellController");
 
-router.get('/', getPresell);
-router.post('/', createPresell);
-router.get('/:slug', getPresellBySlug);
+router.get("/", presellController.listPresells); // 🔥 LISTAR
+router.post("/", presellController.createPresell);
+router.get("/:slug", presellController.getPresellBySlug);
 
 module.exports = router;

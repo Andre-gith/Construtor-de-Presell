@@ -1,8 +1,9 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
 
-const { createTracking } = require('../controllers/trackingController');
+const trackingController = require("../controllers/trackingController");
 
-router.post('/', createTracking);
+router.post("/", trackingController.createTracking);
+router.get("/", trackingController.getTracking);
 
 module.exports = router;

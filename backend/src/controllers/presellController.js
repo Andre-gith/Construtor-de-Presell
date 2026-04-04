@@ -1,11 +1,28 @@
 const prisma = require('../prisma/client');
 
-// listar
+// 🔹 TESTE API
 exports.getPresell = (req, res) => {
   res.send('API rodando 🚀');
 };
 
-// criar presell
+// 🔹 LISTAR TODAS PRESELLS
+exports.listPresells = async (req, res) => {
+  try {
+    const presells = await prisma.presell.findMany({
+      orderBy: {
+        createdAt: "desc"
+      }
+    });
+
+    res.json(presells);
+
+  } catch (error) {
+    console.error("ERRO AO LISTAR:", error);
+    res.status(500).json({ error: "Erro ao buscar presells" });
+  }
+};
+
+// 🔹 CRIAR PRESELL
 exports.createPresell = async (req, res) => {
   try {
     const { title, slug, content, redirectUrl } = req.body;
@@ -22,20 +39,20 @@ exports.createPresell = async (req, res) => {
     res.json(presell);
 
   } catch (error) {
-    console.error(error);
+    console.error("ERRO AO CRIAR:", error);
 
-    // 🔥 TRATAMENTO DE ERRO DE SLUG DUPLICADO
+    // 🔥 Slug duplicado
     if (error.code === "P2002") {
       return res.status(400).json({
         error: "Slug já existe. Escolha outro."
       });
     }
 
-    res.status(500).json({ error: 'Erro ao criar presell' });
+    res.status(500).json({ error: "Erro ao criar presell" });
   }
 };
 
-// buscar por slug + tracking
+// 🔹 BUSCAR PRESELL POR SLUG + TRACKING
 exports.getPresellBySlug = async (req, res) => {
   try {
     const { slug } = req.params;
@@ -45,7 +62,7 @@ exports.getPresellBySlug = async (req, res) => {
     });
 
     if (!page) {
-      return res.status(404).send('Página não encontrada');
+      return res.status(404).send("Página não encontrada");
     }
 
     const script = `
@@ -65,6 +82,7 @@ exports.getPresellBySlug = async (req, res) => {
 
       console.log("UTMs:", utm_source, utm_campaign);
 
+      // 🔥 ENVIA TRACKING
       fetch("http://localhost:3000/tracking", {
         method: "POST",
         headers: {
@@ -77,6 +95,7 @@ exports.getPresellBySlug = async (req, res) => {
         })
       });
 
+      // 🔥 REDIRECIONAMENTO DINÂMICO
       setTimeout(() => {
         window.location.href = "${page.redirectUrl || 'https://google.com'}";
       }, 8000);
@@ -86,7 +105,7 @@ exports.getPresellBySlug = async (req, res) => {
     res.send(page.content + script);
 
   } catch (error) {
-    console.error(error);
-    res.status(500).send('Erro no servidor');
+    console.error("ERRO AO BUSCAR:", error);
+    res.status(500).send("Erro no servidor");
   }
 };
