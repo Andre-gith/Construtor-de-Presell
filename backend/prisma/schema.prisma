@@ -1,0 +1,24 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Presell {
+  id        Int      @id @default(autoincrement())
+  title     String
+  slug      String   @unique
+  content   String
+  createdAt DateTime @default(now())
+}
+
+model Tracking {
+  id          Int      @id @default(autoincrement())
+  slug        String
+  utm_source  String?
+  utm_campaign String?
+  createdAt   DateTime @default(now())
+}
