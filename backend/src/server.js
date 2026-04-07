@@ -1,21 +1,31 @@
-const express = require('express');
-const cors = require('cors');
+require("dotenv").config();
 
-const presellRoutes = require('./routes/presellRoutes');
-const trackingRoutes = require('./routes/trackingRoutes');
+const express = require("express");
+const cors = require("cors");
+
+const authRoutes = require("./routes/authRoutes");
+const presellRoutes = require("./routes/presellRoutes");
+const trackingRoutes = require("./routes/trackingRoutes");
 
 const app = express();
 
+// Middlewares
 app.use(cors());
 app.use(express.json());
 
-app.use('/presell', presellRoutes);
-app.use('/tracking', trackingRoutes);
+// Rotas
+app.use("/auth", authRoutes);
+app.use("/presell", presellRoutes);
+app.use("/tracking", trackingRoutes);
 
-app.get('/', (req, res) => {
-  res.send('API rodando 🚀');
+// Teste
+app.get("/", (req, res) => {
+  res.send("API rodando 🚀");
 });
 
-app.listen(3000, () => {
-  console.log('Servidor rodando em http://localhost:3000');
+// Start
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, () => {
+  console.log(`Servidor rodando na porta ${PORT}`);
 });

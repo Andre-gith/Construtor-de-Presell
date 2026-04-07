@@ -1,39 +1,22 @@
-const prisma = require('../prisma/client');
+const prisma = require("../prismaClient");
 
-// 🔹 salvar tracking
-exports.createTracking = async (req, res) => {
-  try {
-    const { slug, utm_source, utm_campaign } = req.body;
+module.exports = {
+  async track(req, res) {
+    try {
+      const { slug, step, utm_source, utm_campaign } = req.body;
 
-    const tracking = await prisma.tracking.create({
-      data: {
-        slug,
-        utm_source,
-        utm_campaign
-      }
-    });
+      await prisma.tracking.create({
+        data: {
+          slug,
+          step,
+          utm_source,
+          utm_campaign,
+        },
+      });
 
-    res.json(tracking);
-
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Erro ao salvar tracking" });
-  }
-};
-
-// 🔹 listar tracking
-exports.getTracking = async (req, res) => {
-  try {
-    const tracking = await prisma.tracking.findMany({
-      orderBy: {
-        createdAt: "desc"
-      }
-    });
-
-    res.json(tracking);
-
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Erro ao buscar tracking" });
-  }
+      res.json({ success: true });
+    } catch (error) {
+      res.status(500).json({ error: "Erro ao salvar tracking" });
+    }
+  },
 };

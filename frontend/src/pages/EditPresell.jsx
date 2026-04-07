@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import api from "../services/api";
-import { useNavigate } from "react-router-dom";
 
-export default function CreatePresell() {
+export default function EditPresell() {
+  const { id } = useParams();
   const navigate = useNavigate();
 
   const [form, setForm] = useState({
@@ -13,6 +14,23 @@ export default function CreatePresell() {
     step3Content: "",
     redirectUrl: "",
   });
+
+  useEffect(() => {
+    async function loadPresell() {
+      try {
+        const res = await api.get(`/presell`);
+        const found = res.data.find((p) => p.id == id);
+
+        if (found) {
+          setForm(found);
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    }
+
+    loadPresell();
+  }, [id]);
 
   function handleChange(e) {
     setForm({
@@ -25,73 +43,81 @@ export default function CreatePresell() {
     e.preventDefault();
 
     try {
-      await api.post("/presell", form);
-      alert("Presell criada!");
+      await api.put(`/presell/${id}`, form);
+      alert("Presell atualizada!");
+
+      // 🔥 REDIRECIONA AUTOMATICO
       navigate("/dashboard");
     } catch (err) {
-      alert("Erro ao criar presell");
+      alert("Erro ao atualizar");
     }
   }
 
   return (
     <div className="min-h-screen bg-gray-950 text-white flex justify-center">
       <div className="w-full max-w-2xl p-8">
-        <h1 className="text-3xl mb-6 font-bold">Criar Presell</h1>
+        <h1 className="text-3xl mb-6 font-bold">Editar Presell</h1>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
 
-          {/* Título */}
           <input
             name="title"
-            placeholder="Título da página"
+            value={form.title}
             onChange={handleChange}
             className="p-3 rounded bg-gray-800 border border-gray-700"
           />
 
-          {/* Slug */}
           <input
             name="slug"
-            placeholder="Slug (ex: oferta1)"
+            value={form.slug}
             onChange={handleChange}
             className="p-3 rounded bg-gray-800 border border-gray-700"
           />
 
-          {/* Step 1 */}
           <textarea
             name="step1Content"
-            placeholder="Step 1 (conteúdo inicial)"
+            value={form.step1Content}
             onChange={handleChange}
             className="p-3 rounded bg-gray-800 border border-gray-700 h-28"
           />
 
-          {/* Step 2 */}
           <textarea
             name="step2Content"
-            placeholder="Step 2 (engajamento)"
+            value={form.step2Content}
             onChange={handleChange}
             className="p-3 rounded bg-gray-800 border border-gray-700 h-28"
           />
 
-          {/* Step 3 */}
           <textarea
             name="step3Content"
-            placeholder="Step 3 (conversão)"
+            value={form.step3Content}
             onChange={handleChange}
             className="p-3 rounded bg-gray-800 border border-gray-700 h-28"
           />
 
-          {/* Link */}
           <input
             name="redirectUrl"
-            placeholder="Link final (afiliado)"
+            value={form.redirectUrl}
             onChange={handleChange}
             className="p-3 rounded bg-gray-800 border border-gray-700"
           />
 
-          {/* Botão */}
-          <button className="bg-green-500 hover:bg-green-600 transition p-3 rounded font-bold">
-            Criar Presell
-          </button>
+          {/* BOTÕES */}
+          <div className="flex gap-3 mt-4">
+
+            <button className="bg-green-500 px-4 py-2 rounded hover:bg-green-600">
+              Salvar
+            </button>
+
+            <button
+              type="button"
+              onClick={() => navigate("/dashboard")}
+              className="bg-gray-600 px-4 py-2 rounded hover:bg-gray-700"
+            >
+              Cancelar
+            </button>
+
+          </div>
         </form>
       </div>
     </div>

@@ -7,19 +7,35 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model User {
+  id        String    @id @default(uuid())
+  email     String    @unique
+  password  String
+  createdAt DateTime  @default(now())
+
+  presells  Presell[]
+}
+
 model Presell {
-  id        Int      @id @default(autoincrement())
-  title     String
-  slug      String   @unique
-  content   String
-  redirectUrl String?
-  createdAt DateTime @default(now())
+  id            Int      @id @default(autoincrement())
+  title         String
+  slug          String   @unique
+  step1Content  String
+  step2Content  String
+  step3Content  String
+  redirectUrl   String
+  createdAt     DateTime @default(now())
+
+  // 🔥 RELAÇÃO COM USUÁRIO (NOVA)
+  userId        String
+  user          User     @relation(fields: [userId], references: [id])
 }
 
 model Tracking {
-  id          Int      @id @default(autoincrement())
-  slug        String
-  utm_source  String?
+  id           Int      @id @default(autoincrement())
+  slug         String
+  step         String
+  utm_source   String?
   utm_campaign String?
-  createdAt   DateTime @default(now())
+  createdAt    DateTime @default(now())
 }

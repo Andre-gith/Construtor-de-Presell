@@ -1,121 +1,129 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
 import api from "../services/api";
+import { useNavigate } from "react-router-dom";
 
 export default function Dashboard() {
   const [presells, setPresells] = useState([]);
-  const [tracking, setTracking] = useState([]);
+  const navigate = useNavigate();
 
-  async function fetchData() {
+  async function loadPresells() {
     try {
-      const presellRes = await api.get("/presell");
-      const trackingRes = await api.get("/tracking");
-
-      setPresells(presellRes.data);
-      setTracking(trackingRes.data);
-    } catch (error) {
-      console.error(error);
-      alert("Erro ao carregar dados");
+      const res = await api.get("/presell");
+      setPresells(res.data);
+    } catch (err) {
+      console.log(err);
     }
   }
 
   useEffect(() => {
-    fetchData();
+    loadPresells();
   }, []);
 
-  function copyLink(slug) {
-    const url = `http://localhost:3000/presell/${slug}`;
-    navigator.clipboard.writeText(url);
-    alert("Link copiado!");
+  async function handleDelete(id) {
+    const confirmDelete = confirm("Deseja deletar essa presell?");
+    if (!confirmDelete) return;
+
+    await api.delete(`/presell/${id}`);
+    loadPresells();
   }
 
-  function countClicks(slug) {
-    return tracking.filter((t) => t.slug === slug).length;
+  function handleLogout() {
+    localStorage.removeItem("token");
+    navigate("/");
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white">
+    <div className="min-h-screen bg-gray-950 text-white p-6">
 
       {/* HEADER */}
-      <div className="bg-gray-800 border-b border-gray-700 px-8 py-4 flex justify-between items-center">
-        <h1 className="text-2xl font-bold">
-          🚀 Painel Presell
-        </h1>
-
-        <Link
-          to="/create"
-          className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg shadow transition"
-        >
-          + Nova Presell
-        </Link>
-      </div>
-
-      {/* CONTEÚDO */}
-      <div className="p-8">
-
-        <h2 className="text-xl font-semibold text-gray-300 mb-6">
-          Minhas Presells
-        </h2>
-
-        {/* GRID */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-
-          {presells.map((p) => (
-            <div
-              key={p.id}
-              className="bg-gray-800 rounded-2xl shadow-lg p-6 hover:shadow-2xl transition border border-gray-700"
-            >
-              {/* Título */}
-              <h3 className="text-lg font-semibold text-white mb-1">
-                {p.title}
-              </h3>
-
-              {/* Slug */}
-              <p className="text-sm text-gray-400 mb-4">
-                /{p.slug}
-              </p>
-
-              {/* Cliques */}
-              <div className="mb-5">
-                <span className="text-2xl font-bold text-green-400">
-                  {countClicks(p.slug)}
-                </span>
-                <span className="text-gray-400 text-sm ml-1">
-                  cliques
-                </span>
-              </div>
-
-              {/* BOTÕES */}
-              <div className="flex gap-2">
-                <button
-                  onClick={() => copyLink(p.slug)}
-                  className="flex-1 bg-green-600 hover:bg-green-700 text-white py-2 rounded-lg transition"
-                >
-                  Copiar
-                </button>
-
-                <a
-                  href={`http://localhost:3000/presell/${p.slug}`}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="flex-1 text-center border border-gray-600 py-2 rounded-lg hover:bg-gray-700 transition"
-                >
-                  Abrir
-                </a>
-              </div>
-            </div>
-          ))}
-
+      <div className="flex justify-between items-center mb-10">
+        <div>
+          <h1 className="text-3xl font-bold">Dashboard</h1>
+          <p className="text-gray-400 text-sm">
+            Gerencie suas presells
+          </p>
         </div>
 
-        {/* EMPTY STATE */}
-        {presells.length === 0 && (
-          <div className="text-center mt-20 text-gray-500">
-            Nenhuma presell criada ainda
+        <div className="flex gap-3">
+          <button
+            onClick={() => navigate("/create")}
+            className="bg-green-500 px-5 py-2 rounded-lg font-semibold hover:bg-green-600 transition"
+          >
+            + Nova Presell
+          </button>
+
+          <button
+            onClick={handleLogout}
+            className="bg-red-500 px-5 py-2 rounded-lg font-semibold hover:bg-red-600 transition"
+          >
+            Sair
+          </button>
+        </div>
+      </div>
+
+      {/* GRID */}
+      <div className="grid md:grid-cols-3 gap-6">
+
+        {presells.map((p) => (
+          <div
+            key={p.id}
+            className="bg-gray-800 p-6 rounded-2xl shadow-xl hover:shadow-2xl hover:scale-[1.02] transition duration-300 border border-gray-700"
+          >
+
+            {/* HEADER CARD */}
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-lg font-bold">{p.title}</h2>
+
+              <span className="text-xs bg-green-500/20 text-green-400 px-2 py-1 rounded">
+                Ativa
+              </span>
+            </div>
+
+            {/* SLUG */}
+            <p className="text-gray-400 text-sm mb-4 break-all">
+              /presell/{p.slug}
+            </p>
+
+            {/* AÇÕES */}
+            <div className="flex justify-between items-center gap-2">
+
+              <a
+                href={`http://localhost:3000/presell/${p.slug}`}
+                target="_blank"
+                className="bg-blue-500 px-3 py-1 rounded text-sm hover:bg-blue-600 transition"
+              >
+                Abrir
+              </a>
+
+              <button
+                onClick={() => navigate(`/edit/${p.id}`)}
+                className="bg-yellow-500 px-3 py-1 rounded text-sm hover:bg-yellow-600 transition"
+              >
+                Editar
+              </button>
+
+              <button
+                onClick={() => handleDelete(p.id)}
+                className="bg-red-500 px-3 py-1 rounded text-sm hover:bg-red-600 transition"
+              >
+                Deletar
+              </button>
+
+            </div>
+
           </div>
-        )}
+        ))}
 
       </div>
+
+      {/* EMPTY STATE */}
+      {presells.length === 0 && (
+        <div className="text-center mt-20 text-gray-400">
+          <p className="text-lg">Nenhuma presell criada ainda</p>
+          <p className="text-sm">Clique em "Nova Presell" para começar</p>
+        </div>
+      )}
+
     </div>
   );
 }
