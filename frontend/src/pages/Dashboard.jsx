@@ -6,6 +6,8 @@ export default function Dashboard() {
   const [presells, setPresells] = useState([]);
   const navigate = useNavigate();
 
+  const API_URL = import.meta.env.VITE_API_URL;
+
   async function loadPresells() {
     try {
       const res = await api.get("/presell");
@@ -30,6 +32,11 @@ export default function Dashboard() {
   function handleLogout() {
     localStorage.removeItem("token");
     navigate("/");
+  }
+
+  function copyLink(url) {
+    navigator.clipboard.writeText(url);
+    alert("Link copiado!");
   }
 
   return (
@@ -64,55 +71,67 @@ export default function Dashboard() {
       {/* GRID */}
       <div className="grid md:grid-cols-3 gap-6">
 
-        {presells.map((p) => (
-          <div
-            key={p.id}
-            className="bg-gray-800 p-6 rounded-2xl shadow-xl hover:shadow-2xl hover:scale-[1.02] transition duration-300 border border-gray-700"
-          >
+        {presells.map((p) => {
+          const fullUrl = `${API_URL}/presell/${p.slug}`;
 
-            {/* HEADER CARD */}
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-lg font-bold">{p.title}</h2>
+          return (
+            <div
+              key={p.id}
+              className="bg-gray-800 p-6 rounded-2xl shadow-xl hover:shadow-2xl hover:scale-[1.02] transition duration-300 border border-gray-700"
+            >
 
-              <span className="text-xs bg-green-500/20 text-green-400 px-2 py-1 rounded">
-                Ativa
-              </span>
+              {/* HEADER CARD */}
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-lg font-bold">{p.title}</h2>
+
+                <span className="text-xs bg-green-500/20 text-green-400 px-2 py-1 rounded">
+                  Ativa
+                </span>
+              </div>
+
+              {/* LINK (ANTES ERA /presell/slug) */}
+              <p className="text-gray-400 text-sm mb-4 break-all">
+                {fullUrl}
+              </p>
+
+              {/* AÇÕES */}
+              <div className="flex justify-between items-center gap-2 flex-wrap">
+
+                <a
+                  href={fullUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="bg-blue-500 px-3 py-1 rounded text-sm hover:bg-blue-600 transition"
+                >
+                  Abrir
+                </a>
+
+                <button
+                  onClick={() => copyLink(fullUrl)}
+                  className="bg-purple-500 px-3 py-1 rounded text-sm hover:bg-purple-600 transition"
+                >
+                  Copiar
+                </button>
+
+                <button
+                  onClick={() => navigate(`/edit/${p.id}`)}
+                  className="bg-yellow-500 px-3 py-1 rounded text-sm hover:bg-yellow-600 transition"
+                >
+                  Editar
+                </button>
+
+                <button
+                  onClick={() => handleDelete(p.id)}
+                  className="bg-red-500 px-3 py-1 rounded text-sm hover:bg-red-600 transition"
+                >
+                  Deletar
+                </button>
+
+              </div>
+
             </div>
-
-            {/* SLUG */}
-            <p className="text-gray-400 text-sm mb-4 break-all">
-              /presell/{p.slug}
-            </p>
-
-            {/* AÇÕES */}
-            <div className="flex justify-between items-center gap-2">
-
-              <a
-                href={`${import.meta.env.VITE_API_URL}/presell/${p.slug}`}
-                target="_blank"
-                className="bg-blue-500 px-3 py-1 rounded text-sm hover:bg-blue-600 transition"
-              >
-                Abrir
-              </a>
-
-              <button
-                onClick={() => navigate(`/edit/${p.id}`)}
-                className="bg-yellow-500 px-3 py-1 rounded text-sm hover:bg-yellow-600 transition"
-              >
-                Editar
-              </button>
-
-              <button
-                onClick={() => handleDelete(p.id)}
-                className="bg-red-500 px-3 py-1 rounded text-sm hover:bg-red-600 transition"
-              >
-                Deletar
-              </button>
-
-            </div>
-
-          </div>
-        ))}
+          );
+        })}
 
       </div>
 
