@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import api from "../services/api";
+import formatContent from "../utils/formatContent"; // 🔥 ADD
 
 export default function EditPresell() {
   const { id } = useParams();
@@ -43,10 +44,17 @@ export default function EditPresell() {
     e.preventDefault();
 
     try {
-      await api.put(`/presell/${id}`, form);
-      alert("Presell atualizada!");
+      // 🔥 CONVERSÃO AQUI
+      const formattedData = {
+        ...form,
+        step1Content: formatContent(form.step1Content),
+        step2Content: formatContent(form.step2Content),
+        step3Content: formatContent(form.step3Content, true),
+      };
 
-      // 🔥 REDIRECIONA AUTOMATICO
+      await api.put(`/presell/${id}`, formattedData);
+
+      alert("Presell atualizada!");
       navigate("/dashboard");
     } catch (err) {
       alert("Erro ao atualizar");
@@ -102,7 +110,6 @@ export default function EditPresell() {
             className="p-3 rounded bg-gray-800 border border-gray-700"
           />
 
-          {/* BOTÕES */}
           <div className="flex gap-3 mt-4">
 
             <button className="bg-green-500 px-4 py-2 rounded hover:bg-green-600">

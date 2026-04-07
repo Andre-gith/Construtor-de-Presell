@@ -1,6 +1,7 @@
 import { useState } from "react";
 import api from "../services/api";
 import { useNavigate } from "react-router-dom";
+import formatContent from "../utils/formatContent"; // 🔥 ADD
 
 export default function CreatePresell() {
   const navigate = useNavigate();
@@ -25,7 +26,16 @@ export default function CreatePresell() {
     e.preventDefault();
 
     try {
-      await api.post("/presell", form);
+      // 🔥 AQUI ESTÁ A MÁGICA
+      const formattedData = {
+        ...form,
+        step1Content: formatContent(form.step1Content),
+        step2Content: formatContent(form.step2Content),
+        step3Content: formatContent(form.step3Content, true),
+      };
+
+      await api.post("/presell", formattedData);
+
       alert("Presell criada!");
       navigate("/dashboard");
     } catch (err) {
@@ -40,7 +50,6 @@ export default function CreatePresell() {
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
 
-          {/* Título */}
           <input
             name="title"
             placeholder="Título da página"
@@ -48,7 +57,6 @@ export default function CreatePresell() {
             className="p-3 rounded bg-gray-800 border border-gray-700"
           />
 
-          {/* Slug */}
           <input
             name="slug"
             placeholder="Slug (ex: oferta1)"
@@ -56,7 +64,6 @@ export default function CreatePresell() {
             className="p-3 rounded bg-gray-800 border border-gray-700"
           />
 
-          {/* Step 1 */}
           <textarea
             name="step1Content"
             placeholder="Step 1 (conteúdo inicial)"
@@ -64,7 +71,6 @@ export default function CreatePresell() {
             className="p-3 rounded bg-gray-800 border border-gray-700 h-28"
           />
 
-          {/* Step 2 */}
           <textarea
             name="step2Content"
             placeholder="Step 2 (engajamento)"
@@ -72,7 +78,6 @@ export default function CreatePresell() {
             className="p-3 rounded bg-gray-800 border border-gray-700 h-28"
           />
 
-          {/* Step 3 */}
           <textarea
             name="step3Content"
             placeholder="Step 3 (conversão)"
@@ -80,7 +85,6 @@ export default function CreatePresell() {
             className="p-3 rounded bg-gray-800 border border-gray-700 h-28"
           />
 
-          {/* Link */}
           <input
             name="redirectUrl"
             placeholder="Link final (afiliado)"
@@ -88,7 +92,6 @@ export default function CreatePresell() {
             className="p-3 rounded bg-gray-800 border border-gray-700"
           />
 
-          {/* Botão */}
           <button className="bg-green-500 hover:bg-green-600 transition p-3 rounded font-bold">
             Criar Presell
           </button>
