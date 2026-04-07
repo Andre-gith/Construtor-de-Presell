@@ -88,7 +88,7 @@ export default function Dashboard() {
             <div className="flex justify-between items-center gap-2">
 
               <a
-                href={`http://localhost:3000/presell/${p.slug}`}
+                href={`${import.meta.env.VITE_API_URL}/presell/${p.slug}`}
                 target="_blank"
                 className="bg-blue-500 px-3 py-1 rounded text-sm hover:bg-blue-600 transition"
               >
