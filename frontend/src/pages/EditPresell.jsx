@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import api from "../services/api";
-import formatContent from "../utils/formatContent"; // 🔥 ADD
+import formatContent from "../utils/formatContent";
 
 export default function EditPresell() {
   const { id } = useParams();
@@ -44,12 +44,11 @@ export default function EditPresell() {
     e.preventDefault();
 
     try {
-      // 🔥 CONVERSÃO AQUI
       const formattedData = {
         ...form,
         step1Content: formatContent(form.step1Content),
         step2Content: formatContent(form.step2Content),
-        step3Content: formatContent(form.step3Content, true),
+        step3Content: formatContent(form.step3Content),
       };
 
       await api.put(`/presell/${id}`, formattedData);

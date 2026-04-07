@@ -1,47 +1,46 @@
-export default function formatContent(text, isLastStep = false) {
+export default function formatContent(text) {
   if (!text) return "";
 
-  // 🔥 REMOVE QUALQUER BOTÃO QUE O USUÁRIO TENHA DIGITADO
-  text = text
-    .replace(/<button.*?>.*?<\/button>/gi, "")
-    .replace(/Continuar/gi, "");
+  // 🔥 REMOVE QUALQUER BOTÃO ANTIGO
+  text = text.replace(/<button.*?>.*?<\/button>/gi, "");
 
-  const parts = text.split("\n\n");
+  // 🔥 QUEBRA LINHAS SIMPLES
+  const lines = text
+    .split("\n")
+    .map(line => line.trim())
+    .filter(line => line !== "");
 
   let html = "";
 
-  parts.forEach((p, index) => {
+  lines.forEach((line, index) => {
     if (index === 0) {
-      html += `<h1 style="font-size:28px; font-weight:bold; margin-bottom:15px;">${p}</h1>`;
+      // 🔥 TÍTULO PRINCIPAL
+      html += `
+        <h1 style="
+          font-size:28px;
+          font-weight:bold;
+          margin-bottom:20px;
+          text-align:center;
+          line-height:1.3;
+        ">
+          ${line}
+        </h1>
+      `;
     } else {
-      html += `<p style="margin-bottom:10px;">${p}</p>`;
+      // 🔥 TEXTO NORMAL
+      html += `
+        <p style="
+          margin-bottom:16px;
+          font-size:18px;
+          color:#cbd5e1;
+          text-align:center;
+          line-height:1.5;
+        ">
+          ${line}
+        </p>
+      `;
     }
   });
-
-  // 🔥 ADICIONA APENAS 1 BOTÃO
-  if (isLastStep) {
-    html += `<button onclick="redirect()" style="
-      margin-top:20px;
-      padding:12px 20px;
-      background:#22c55e;
-      color:white;
-      border:none;
-      border-radius:8px;
-      cursor:pointer;
-      font-weight:bold;
-    ">Continuar</button>`;
-  } else {
-    html += `<button onclick="nextStep()" style="
-      margin-top:20px;
-      padding:12px 20px;
-      background:#3b82f6;
-      color:white;
-      border:none;
-      border-radius:8px;
-      cursor:pointer;
-      font-weight:bold;
-    ">Continuar</button>`;
-  }
 
   return html;
 }

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import api from "../services/api";
 import { useNavigate } from "react-router-dom";
-import formatContent from "../utils/formatContent"; // 🔥 ADD
+import formatContent from "../utils/formatContent";
 
 export default function CreatePresell() {
   const navigate = useNavigate();
@@ -26,12 +26,11 @@ export default function CreatePresell() {
     e.preventDefault();
 
     try {
-      // 🔥 AQUI ESTÁ A MÁGICA
       const formattedData = {
         ...form,
         step1Content: formatContent(form.step1Content),
         step2Content: formatContent(form.step2Content),
-        step3Content: formatContent(form.step3Content, true),
+        step3Content: formatContent(form.step3Content),
       };
 
       await api.post("/presell", formattedData);
