@@ -57,7 +57,7 @@ module.exports = {
     }
   },
 
-  // ✅ LISTAR PRESELLS DO USUÁRIO
+  // ✅ LISTAR PRESELLS
   async list(req, res) {
     try {
       const presells = await prisma.presell.findMany({
@@ -122,7 +122,7 @@ module.exports = {
     }
   },
 
-  // ✅ RENDERIZAR PRESELL (PÁGINA FINAL)
+  // ✅ RENDERIZAR PRESELL (VERSÃO FINAL)
   async render(req, res) {
     try {
       const { slug } = req.params;
@@ -145,62 +145,63 @@ module.exports = {
               body {
                 margin: 0;
                 font-family: Arial, sans-serif;
-                background: linear-gradient(135deg, #0f172a, #020617);
+                background: linear-gradient(135deg, #020617, #0f172a);
                 color: white;
                 display: flex;
                 justify-content: center;
                 align-items: center;
                 height: 100vh;
+                padding: 20px;
               }
 
               .container {
                 max-width: 500px;
-                width: 90%;
+                width: 100%;
                 text-align: center;
-                background: #111827;
+                background: #0f172a;
                 padding: 30px;
-                border-radius: 12px;
-                box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-                animation: fade 0.5s ease;
-              }
-
-              h1, h2 {
-                margin-bottom: 15px;
-              }
-
-              p {
-                color: #9ca3af;
-                margin-bottom: 20px;
-              }
-
-              button {
-                background: #22c55e;
-                border: none;
-                padding: 12px 20px;
-                color: white;
-                font-weight: bold;
-                border-radius: 8px;
-                cursor: pointer;
-                transition: 0.3s;
-              }
-
-              button:hover {
-                background: #16a34a;
+                border-radius: 20px;
+                box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+                border: 1px solid #1e293b;
+                animation: fade 0.4s ease;
               }
 
               .progress {
-                height: 5px;
-                background: #1f2937;
-                margin-bottom: 20px;
-                border-radius: 5px;
+                height: 6px;
+                background: #1e293b;
+                margin-bottom: 25px;
+                border-radius: 10px;
                 overflow: hidden;
               }
 
               .bar {
                 height: 100%;
                 width: 33%;
-                background: #22c55e;
+                background: linear-gradient(90deg,#22c55e,#4ade80);
                 transition: width 0.3s;
+              }
+
+              #content {
+                min-height: 150px;
+              }
+
+              button {
+                margin-top: 25px;
+                padding: 14px;
+                width: 100%;
+                background: linear-gradient(135deg,#3b82f6,#2563eb);
+                color: white;
+                border: none;
+                border-radius: 12px;
+                font-size: 16px;
+                font-weight: bold;
+                cursor: pointer;
+                transition: 0.3s;
+                box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+              }
+
+              button:hover {
+                transform: scale(1.03);
               }
 
               @keyframes fade {
@@ -219,6 +220,8 @@ module.exports = {
 
               <div id="content">${presell.step1Content}</div>
 
+              <button id="btn" onclick="nextStep()">Continuar</button>
+
             </div>
 
             <script>
@@ -230,16 +233,23 @@ module.exports = {
                 \`${presell.step3Content}\`
               ];
 
-              document.body.addEventListener("click", () => {
+              function nextStep() {
                 if (step < steps.length) {
                   document.getElementById("content").innerHTML = steps[step];
                   step++;
 
                   document.getElementById("bar").style.width = (step * 33) + "%";
+
+                  if (step === 3) {
+                    const btn = document.getElementById("btn");
+                    btn.innerText = "Ver agora";
+                    btn.style.background = "linear-gradient(135deg,#22c55e,#16a34a)";
+                  }
+
                 } else {
                   window.location.href = "${presell.redirectUrl}";
                 }
-              });
+              }
             </script>
           </body>
         </html>
